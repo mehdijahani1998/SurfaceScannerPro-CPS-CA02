@@ -2,6 +2,7 @@ package com.example.surfacescannerpro;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -14,6 +15,8 @@ import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
+
+import java.sql.Timestamp;
 
 public class MovingActivity extends AppCompatActivity {
 
@@ -31,6 +34,13 @@ public class MovingActivity extends AppCompatActivity {
     private double accelerationPrevValue;
 
     private double gyroCurrentValue, gyroPrevValue;
+    private double current_time;
+
+    private float xOmega = 0;
+    private float yOmega = 0;
+    private float zOmega = 0;
+    private float xA, xB, xC = 0;
+    private double tetha = 0;
 
     private int pointsPlotted = 15;
     private int graphPointsInterval = 0;
@@ -50,17 +60,17 @@ public class MovingActivity extends AppCompatActivity {
         @Override
         public void onSensorChanged(SensorEvent event) {
             if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-                float x = event.values[0];
-                float y = event.values[1];
-                float z = event.values[2];
+                xA = event.values[0];
+                xB = event.values[1];
+                xC = event.values[2];
 
-                accelerationCurrentValue = Math.sqrt(x * x + y * y + z * z);
+                //accelerationCurrentValue = Math.sqrt(x * x + y * y + z * z);
 
                 double defPrevCurrentAcceleration = Math.abs(accelerationCurrentValue - accelerationPrevValue);
                 accelerationPrevValue = accelerationCurrentValue;
 
-                txt_currentAccel.setText("Current acceleration = " + (int) accelerationCurrentValue + " - "+ (int) gyroCurrentValue);
-                txt_prevAccel.setText("Previous acceleration = " + (int) accelerationPrevValue + " - " + (int) gyroPrevValue);
+                //txt_currentAccel.setText("Current acceleration = " + (int) accelerationCurrentValue + " - "+ (int) gyroCurrentValue);
+                //txt_prevAccel.setText("Previous acceleration = " + (int) accelerationPrevValue + " - " + (int) gyroPrevValue);
                 txt_accel.setText("Acceleration change = " + (int) defPrevCurrentAcceleration);
 
                 prog_shakeMeter.setProgress((int) defPrevCurrentAcceleration);
@@ -72,15 +82,24 @@ public class MovingActivity extends AppCompatActivity {
             }
             if(event.sensor.getType() == Sensor.TYPE_GYROSCOPE){
                 System.out.println("salaaaaaam!");
-                float xteta = event.values[0];
-                float yteta = event.values[1];
-                float zteta = event.values[2];
+                xOmega = event.values[0];
+                yOmega = event.values[1];
+                zOmega = event.values[2];
 
-                gyroCurrentValue = 100* (Math.sin(xteta) + Math.sin(yteta) + Math.sin(zteta));
+                //gyroCurrentValue = 100* (Math.sin(xteta) + Math.sin(yteta) + Math.sin(zteta));
 
                 double defPrevCurrentGyro = Math.abs(gyroCurrentValue - gyroPrevValue);
                 gyroPrevValue = gyroCurrentValue;
             }
+            double dT = (event.timestamp - current_time) / 1e9;
+            if (dT > 0){
+                tetha = yOmega*dT + tetha;
+            }
+            //double theta2 = tetha*10000;
+            txt_currentAccel.setText("Current acceleration = " + (int) accelerationCurrentValue + " - " ;
+            txt_prevAccel.setText("Previous acceleration = " + (int) accelerationPrevValue + " - " + (int) gyroPrevValue);
+
+            current_time = event.timestamp;
         }
 
         @Override
@@ -95,7 +114,9 @@ public class MovingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_moving);
+
+        Intent intent = getIntent();
 
         txt_accel = findViewById(R.id.txt_accel);
         txt_currentAccel = findViewById(R.id.txt_currentAccel);
