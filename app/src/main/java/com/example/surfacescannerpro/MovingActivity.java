@@ -96,7 +96,7 @@ public class MovingActivity extends AppCompatActivity {
                 tetha = yOmega*dT + tetha;
             }
             //double theta2 = tetha*10000;
-            txt_currentAccel.setText("Current acceleration = " + (int) accelerationCurrentValue + " - " ;
+            txt_currentAccel.setText("Current acceleration = " + (int) accelerationCurrentValue + " - " );
             txt_prevAccel.setText("Previous acceleration = " + (int) accelerationPrevValue + " - " + (int) gyroPrevValue);
 
             current_time = event.timestamp;
