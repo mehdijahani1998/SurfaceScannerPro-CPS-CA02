@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">SurfaceScannerPro</string>
     <string name="button_start">Start!</string>
+    <string name="button_show_result">Stop, show diagram</string>
 </resources>
